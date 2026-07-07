@@ -90,6 +90,18 @@ export default function DiceTray() {
     })
   }
 
+  const chooseColor = (id) => {
+    setSelectedColor(id)
+    // If any dice are selected, recolour them to the chosen colour too.
+    if (selectedIds.size > 0) {
+      setDice((current) =>
+        current.map((d) =>
+          selectedIds.has(d.id) ? { ...d, colorId: id } : d,
+        ),
+      )
+    }
+  }
+
   const addDie = () => {
     setDice((current) => [
       ...current,
@@ -182,7 +194,7 @@ export default function DiceTray() {
               type="button"
               className={`swatch ${selectedColor === c.id ? 'selected' : ''}`}
               style={{ background: c.die }}
-              onClick={() => setSelectedColor(c.id)}
+              onClick={() => chooseColor(c.id)}
               aria-label={c.label}
               aria-pressed={selectedColor === c.id}
               title={c.label}
