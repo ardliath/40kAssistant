@@ -1,5 +1,8 @@
 import { useState, useRef, useEffect } from 'react'
+import { QRCodeSVG } from 'qrcode.react'
 import { useLocalStorage } from '../hooks/useLocalStorage'
+import { DICE_COLORS, colorById } from '../diceColors'
+import { buildShareUrl } from '../share/shareLinks'
 import './DiceTray.css'
 
 // Which of the 9 grid cells hold a pip, for each face value (1-6).
@@ -15,21 +18,6 @@ const PIP_LAYOUT = {
   5: [0, 2, 4, 6, 8],
   6: [0, 2, 3, 5, 6, 8],
 }
-
-// Available die colours. `die` is the body colour, `pip` the dot colour
-// chosen to stay legible against it. White is the default.
-const DICE_COLORS = [
-  { id: 'white', label: 'White', die: '#f4f1ea', pip: '#1a1a1a' },
-  { id: 'red', label: 'Red', die: '#b02a2a', pip: '#ffffff' },
-  { id: 'blue', label: 'Blue', die: '#2a4bb0', pip: '#ffffff' },
-  { id: 'green', label: 'Green', die: '#2a8a4a', pip: '#ffffff' },
-  { id: 'yellow', label: 'Yellow', die: '#e8c53a', pip: '#1a1a1a' },
-  { id: 'purple', label: 'Purple', die: '#6a2ab0', pip: '#ffffff' },
-  { id: 'black', label: 'Black', die: '#1c1c1c', pip: '#f0f0f0' },
-]
-
-const colorById = (id) =>
-  DICE_COLORS.find((c) => c.id === id) ?? DICE_COLORS[0]
 
 const randomFace = () => Math.floor(Math.random() * 6) + 1
 
@@ -77,8 +65,36 @@ export default function DiceTray() {
   const rolling = rollingIds.size > 0
   const intervalRef = useRef(null)
 
+  // Share panel state.
+  const [shareUrl, setShareUrl] = useState(null) // null = panel closed
+  const [copied, setCopied] = useState(false)
+
+  // Show a one-time note if this session was opened from a share link.
+  const [importNote, setImportNote] = useState(
+    () => window.sessionStorage.getItem('40k.sharedImport') === '1',
+  )
+  useEffect(() => {
+    if (importNote) window.sessionStorage.removeItem('40k.sharedImport')
+  }, [importNote])
+
   // Clean up the scramble interval if we unmount mid-roll.
   useEffect(() => () => clearInterval(intervalRef.current), [])
+
+  const openShare = () => {
+    setShareUrl(buildShareUrl())
+    setCopied(false)
+  }
+
+  const copyLink = async () => {
+    try {
+      await navigator.clipboard.writeText(shareUrl)
+      setCopied(true)
+      setTimeout(() => setCopied(false), 1500)
+    } catch {
+      // Clipboard blocked (e.g. insecure context) — the link is still
+      // visible and selectable in the field for a manual copy.
+    }
+  }
 
   const toggleSelect = (id) => {
     if (rolling) return
@@ -162,6 +178,20 @@ export default function DiceTray() {
 
   return (
     <section className="dice-tray-frame">
+      {importNote && (
+        <div className="import-note" role="status">
+          <span>Loaded a shared tray.</span>
+          <button
+            type="button"
+            className="import-note-dismiss"
+            onClick={() => setImportNote(false)}
+            aria-label="Dismiss"
+          >
+            ✕
+          </button>
+        </div>
+      )}
+
       <div className="dice-tray-felt">
         {dice.length === 0 ? (
           <p className="tray-empty">Add a die to begin</p>
@@ -220,12 +250,47 @@ export default function DiceTray() {
           >
             {hasSelection ? 'Clear Selected' : 'Clear All'}
           </button>
+          <button
+            className="tray-btn share-btn"
+            onClick={openShare}
+            disabled={rolling || dice.length === 0}
+          >
+            Share
+          </button>
         </div>
 
         {hasSelection && (
           <p className="selection-hint">
             {selectedIds.size} selected — click a die to toggle
           </p>
+        )}
+
+        {shareUrl && (
+          <div className="share-panel">
+            <p className="share-title">Share this tray</p>
+            <div className="share-row">
+              <input
+                className="share-url"
+                type="text"
+                readOnly
+                value={shareUrl}
+                onFocus={(e) => e.target.select()}
+                aria-label="Shareable link"
+              />
+              <button className="tray-btn add-btn" onClick={copyLink}>
+                {copied ? 'Copied!' : 'Copy'}
+              </button>
+            </div>
+            <div className="share-qr">
+              <QRCodeSVG value={shareUrl} size={180} bgColor="#f4f1ea" fgColor="#1a1a1a" />
+            </div>
+            <button
+              className="tray-btn clear-btn"
+              onClick={() => setShareUrl(null)}
+            >
+              Close
+            </button>
+          </div>
         )}
       </div>
     </section>
