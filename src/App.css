@@ -1,0 +1,150 @@
+.app {
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 2rem 1.5rem 4rem;
+}
+
+.app-header {
+  text-align: center;
+  margin-bottom: 2.5rem;
+}
+
+.app-header h1 {
+  font-size: 2.4rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  margin: 0;
+  color: #d4af37;
+  text-shadow: 0 0 12px rgba(212, 175, 55, 0.35);
+}
+
+.subtitle {
+  margin: 0.25rem 0 0;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  font-size: 0.85rem;
+  color: #9a8f80;
+}
+
+.trackers {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 1.5rem;
+}
+
+/* ---- Tracker card ---- */
+.tracker {
+  background: linear-gradient(160deg, #1e1a17 0%, #16130f 100%);
+  border: 1px solid #3a332b;
+  border-radius: 12px;
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.25rem;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+}
+
+.tracker h2 {
+  margin: 0;
+  font-size: 1.1rem;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: #c9b892;
+  text-align: center;
+}
+
+/* ---- Counter row ---- */
+.counter {
+  display: flex;
+  align-items: center;
+  gap: 1.25rem;
+}
+
+.value {
+  font-size: 3rem;
+  font-weight: 700;
+  min-width: 3rem;
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+  color: #f4ecdf;
+}
+
+/* ---- Buttons ---- */
+.btn {
+  font-family: inherit;
+  cursor: pointer;
+  border: 1px solid #4a4136;
+  background: #2b2620;
+  color: #e8e0d5;
+  transition: background 0.15s ease, transform 0.05s ease, opacity 0.15s ease;
+}
+
+.btn:hover:not(:disabled) {
+  background: #3a332b;
+}
+
+.btn:active:not(:disabled) {
+  transform: translateY(1px);
+}
+
+.btn:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+
+.btn-round {
+  width: 3rem;
+  height: 3rem;
+  border-radius: 50%;
+  font-size: 1.6rem;
+  line-height: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.btn-wide {
+  width: 100%;
+  padding: 0.65rem 1rem;
+  border-radius: 8px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+/* ---- Turn indicator ---- */
+.turn-indicator {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+}
+
+.indicator-dot {
+  width: 0.85rem;
+  height: 0.85rem;
+  border-radius: 50%;
+  display: inline-block;
+}
+
+.indicator-dot.you {
+  background: #4caf7d;
+  box-shadow: 0 0 10px rgba(76, 175, 125, 0.7);
+}
+
+.indicator-dot.opponent {
+  background: #d9534f;
+  box-shadow: 0 0 10px rgba(217, 83, 79, 0.7);
+}
+
+/* Subtle border accent to reinforce whose turn it is */
+.turn-tracker.you {
+  border-color: #33604a;
+}
+
+.turn-tracker.opponent {
+  border-color: #6b3230;
+}
