@@ -80,6 +80,11 @@
   grid-template-rows: repeat(3, 1fr);
   gap: 2px;
   border-radius: 14px;
+  /* 3px transparent border reserves space so selecting doesn't shift layout
+     (box-sizing: border-box keeps the outer size fixed) */
+  border: 3px solid transparent;
+  font: inherit;
+  cursor: pointer;
   /* Highlight/shadow overlay on top of the chosen die colour for depth */
   background:
     linear-gradient(
@@ -93,6 +98,29 @@
     inset 0 2px 3px rgba(255, 255, 255, 0.5),
     inset 0 -3px 5px rgba(0, 0, 0, 0.25);
   z-index: 1;
+  transition: border-color 0.12s ease, transform 0.08s ease;
+}
+
+/* Faint hint that a die is clickable */
+.die:hover:not(:disabled):not(.selected) {
+  border-color: rgba(212, 175, 55, 0.45);
+}
+
+/* Selected dice get a glowing gold outline */
+.die.selected {
+  border-color: #d4af37;
+  box-shadow:
+    0 6px 12px rgba(0, 0, 0, 0.45),
+    inset 0 2px 3px rgba(255, 255, 255, 0.5),
+    inset 0 -3px 5px rgba(0, 0, 0, 0.25),
+    0 0 12px rgba(212, 175, 55, 0.75);
+  z-index: 2;
+}
+
+/* Keep dice at full opacity while a roll is in progress */
+.die:disabled {
+  opacity: 1;
+  cursor: default;
 }
 
 .die-cell {
@@ -138,6 +166,13 @@
   flex-direction: column;
   align-items: center;
   gap: 14px;
+}
+
+.selection-hint {
+  margin: 0;
+  font-size: 0.8rem;
+  letter-spacing: 0.05em;
+  color: #d4af37;
 }
 
 /* Colour picker swatches */

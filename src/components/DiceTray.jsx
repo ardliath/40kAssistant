@@ -33,28 +33,33 @@ const colorById = (id) =>
 
 const randomFace = () => Math.floor(Math.random() * 6) + 1
 
-/** A single D6 face rendered with pips, in the given colour. */
-function Die({ value, colorId, rolling }) {
+/** A single clickable D6 face rendered with pips, in the given colour. */
+function Die({ value, colorId, rolling, selected, disabled, onClick }) {
   const color = colorById(colorId)
   const litCells = PIP_LAYOUT[value] ?? []
   return (
-    <div
-      className={`die ${rolling ? 'rolling' : ''}`}
+    <button
+      type="button"
+      className={`die ${rolling ? 'rolling' : ''} ${selected ? 'selected' : ''}`}
       style={{ '--die-bg': color.die, '--pip-color': color.pip }}
-      aria-label={`${color.label} die showing ${value}`}
+      onClick={onClick}
+      disabled={disabled}
+      aria-pressed={selected}
+      aria-label={`${color.label} die showing ${value}${selected ? ', selected' : ''}`}
     >
       {Array.from({ length: 9 }, (_, cell) => (
         <span key={cell} className="die-cell">
           {litCells.includes(cell) && <span className="pip" />}
         </span>
       ))}
-    </div>
+    </button>
   )
 }
 
 /**
  * The dice tray: a wooden-rimmed green felt surface holding any number of
- * D6s. Add dice in the colour of your choice and roll them all at once.
+ * D6s. Add dice in the colour of your choice, click dice to select them,
+ * and roll/clear either the whole tray or just your selection.
  * The set of dice is persisted to localStorage.
  */
 export default function DiceTray() {
@@ -65,11 +70,25 @@ export default function DiceTray() {
     '40k.diceColor',
     'white',
   )
-  const [rolling, setRolling] = useState(false)
+  // Ids of currently selected dice (transient UI state, not persisted).
+  const [selectedIds, setSelectedIds] = useState(() => new Set())
+  // Ids of dice mid-roll; while non-empty a roll animation is in progress.
+  const [rollingIds, setRollingIds] = useState(() => new Set())
+  const rolling = rollingIds.size > 0
   const intervalRef = useRef(null)
 
   // Clean up the scramble interval if we unmount mid-roll.
   useEffect(() => () => clearInterval(intervalRef.current), [])
+
+  const toggleSelect = (id) => {
+    if (rolling) return
+    setSelectedIds((prev) => {
+      const next = new Set(prev)
+      if (next.has(id)) next.delete(id)
+      else next.add(id)
+      return next
+    })
+  }
 
   const addDie = () => {
     setDice((current) => [
@@ -83,26 +102,51 @@ export default function DiceTray() {
   }
 
   const clearDice = () => {
-    if (rolling) return
-    setDice([])
+    if (rolling || dice.length === 0) return
+    if (selectedIds.size > 0) {
+      // Remove only the selected dice.
+      setDice((current) => current.filter((d) => !selectedIds.has(d.id)))
+      setSelectedIds(new Set())
+    } else {
+      // Nothing selected: clear the whole tray.
+      setDice([])
+    }
   }
 
-  const rollAll = () => {
+  const rollDice = () => {
     if (rolling || dice.length === 0) return
-    setRolling(true)
 
-    // Rapidly flick every die through random faces to fake a tumble...
+    // Roll the selection if there is one, otherwise roll every die.
+    const targetIds =
+      selectedIds.size > 0
+        ? new Set(dice.filter((d) => selectedIds.has(d.id)).map((d) => d.id))
+        : new Set(dice.map((d) => d.id))
+    if (targetIds.size === 0) return
+
+    setRollingIds(targetIds)
+
+    // Rapidly flick the targeted dice through random faces to fake a tumble...
     intervalRef.current = setInterval(() => {
-      setDice((current) => current.map((d) => ({ ...d, value: randomFace() })))
+      setDice((current) =>
+        current.map((d) =>
+          targetIds.has(d.id) ? { ...d, value: randomFace() } : d,
+        ),
+      )
     }, 70)
 
     // ...then settle on the final results after a short spin.
     setTimeout(() => {
       clearInterval(intervalRef.current)
-      setDice((current) => current.map((d) => ({ ...d, value: randomFace() })))
-      setRolling(false)
+      setDice((current) =>
+        current.map((d) =>
+          targetIds.has(d.id) ? { ...d, value: randomFace() } : d,
+        ),
+      )
+      setRollingIds(new Set())
     }, 650)
   }
+
+  const hasSelection = selectedIds.size > 0
 
   return (
     <section className="dice-tray-frame">
@@ -116,7 +160,10 @@ export default function DiceTray() {
                 key={d.id}
                 value={d.value}
                 colorId={d.colorId}
-                rolling={rolling}
+                rolling={rollingIds.has(d.id)}
+                selected={selectedIds.has(d.id)}
+                disabled={rolling}
+                onClick={() => toggleSelect(d.id)}
               />
             ))}
           </div>
@@ -149,19 +196,25 @@ export default function DiceTray() {
           </button>
           <button
             className="tray-btn roll-btn"
-            onClick={rollAll}
+            onClick={rollDice}
             disabled={rolling || dice.length === 0}
           >
-            {rolling ? 'Rolling…' : 'Roll'}
+            {rolling ? 'Rolling…' : hasSelection ? 'Roll Selected' : 'Roll All'}
           </button>
           <button
             className="tray-btn clear-btn"
             onClick={clearDice}
             disabled={rolling || dice.length === 0}
           >
-            Clear
+            {hasSelection ? 'Clear Selected' : 'Clear All'}
           </button>
         </div>
+
+        {hasSelection && (
+          <p className="selection-hint">
+            {selectedIds.size} selected — click a die to toggle
+          </p>
+        )}
       </div>
     </section>
   )
