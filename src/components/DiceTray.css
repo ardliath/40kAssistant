@@ -38,10 +38,26 @@
     inset 0 0 60px rgba(0, 0, 0, 0.55),
     inset 0 2px 4px rgba(0, 0, 0, 0.6);
   position: relative;
-  /* Centre the die on the felt */
+  /* Centre the dice on the felt */
   display: flex;
   align-items: center;
   justify-content: center;
+  padding: 24px;
+}
+
+/* Dice lay out in a centred, wrapping grid */
+.dice-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  align-items: center;
+  justify-content: center;
+}
+
+.tray-empty {
+  color: rgba(255, 255, 255, 0.4);
+  font-style: italic;
+  letter-spacing: 0.05em;
 }
 
 /* Faint stitched border just inside the felt for a card-table feel */
@@ -64,11 +80,18 @@
   grid-template-rows: repeat(3, 1fr);
   gap: 2px;
   border-radius: 14px;
-  background: linear-gradient(145deg, #fdfdfb 0%, #d9d5cc 100%);
+  /* Highlight/shadow overlay on top of the chosen die colour for depth */
+  background:
+    linear-gradient(
+      145deg,
+      rgba(255, 255, 255, 0.35) 0%,
+      rgba(0, 0, 0, 0.18) 100%
+    ),
+    var(--die-bg, #f4f1ea);
   box-shadow:
     0 6px 12px rgba(0, 0, 0, 0.45),
-    inset 0 2px 3px rgba(255, 255, 255, 0.9),
-    inset 0 -3px 5px rgba(0, 0, 0, 0.18);
+    inset 0 2px 3px rgba(255, 255, 255, 0.5),
+    inset 0 -3px 5px rgba(0, 0, 0, 0.25);
   z-index: 1;
 }
 
@@ -82,8 +105,8 @@
   width: 15px;
   height: 15px;
   border-radius: 50%;
-  background: radial-gradient(circle at 35% 30%, #4a4a4a 0%, #111 70%);
-  box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.25);
+  background: var(--pip-color, #111);
+  box-shadow: inset 0 -1px 2px rgba(0, 0, 0, 0.35);
 }
 
 /* ---- Roll animation ---- */
@@ -109,28 +132,92 @@
   }
 }
 
-/* ---- Roll button ---- */
-.roll-btn {
-  align-self: center;
-  padding: 0.7rem 2rem;
-  border-radius: 10px;
-  font-size: 1rem;
-  font-weight: 700;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  color: #f4ecdf;
-  border: 1px solid #6b3230;
-  background: linear-gradient(160deg, #7a2f2c 0%, #521e1c 100%);
-  cursor: pointer;
-  transition: filter 0.15s ease, transform 0.05s ease;
+/* ---- Controls under the felt ---- */
+.tray-controls {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
 }
 
-.roll-btn:hover:not(:disabled) {
+/* Colour picker swatches */
+.color-swatches {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.swatch {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  border: 2px solid rgba(255, 255, 255, 0.35);
+  cursor: pointer;
+  padding: 0;
+  transition: transform 0.1s ease, box-shadow 0.1s ease;
+}
+
+.swatch:hover {
+  transform: scale(1.1);
+}
+
+.swatch.selected {
+  border-color: #f4ecdf;
+  box-shadow:
+    0 0 0 2px #3f2716,
+    0 0 8px rgba(244, 236, 223, 0.6);
+  transform: scale(1.1);
+}
+
+/* Action buttons */
+.tray-buttons {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.tray-btn {
+  padding: 0.6rem 1.4rem;
+  border-radius: 10px;
+  font-size: 0.95rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: filter 0.15s ease, transform 0.05s ease, opacity 0.15s ease;
+}
+
+.tray-btn:hover:not(:disabled) {
   filter: brightness(1.15);
 }
 
-.roll-btn:active:not(:disabled) {
+.tray-btn:active:not(:disabled) {
   transform: translateY(1px);
+}
+
+.tray-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.add-btn {
+  color: #f4ecdf;
+  border: 1px solid #4a4136;
+  background: linear-gradient(160deg, #3a332b 0%, #26221c 100%);
+}
+
+.roll-btn {
+  color: #f4ecdf;
+  border: 1px solid #6b3230;
+  background: linear-gradient(160deg, #7a2f2c 0%, #521e1c 100%);
+}
+
+.clear-btn {
+  color: #cdbfae;
+  border: 1px solid #4a4136;
+  background: transparent;
 }
 
 .roll-btn:disabled {

@@ -16,11 +16,33 @@ const PIP_LAYOUT = {
   6: [0, 2, 3, 5, 6, 8],
 }
 
-/** A single D6 face rendered with pips. */
-function Die({ value, rolling }) {
+// Available die colours. `die` is the body colour, `pip` the dot colour
+// chosen to stay legible against it. White is the default.
+const DICE_COLORS = [
+  { id: 'white', label: 'White', die: '#f4f1ea', pip: '#1a1a1a' },
+  { id: 'red', label: 'Red', die: '#b02a2a', pip: '#ffffff' },
+  { id: 'blue', label: 'Blue', die: '#2a4bb0', pip: '#ffffff' },
+  { id: 'green', label: 'Green', die: '#2a8a4a', pip: '#ffffff' },
+  { id: 'yellow', label: 'Yellow', die: '#e8c53a', pip: '#1a1a1a' },
+  { id: 'purple', label: 'Purple', die: '#6a2ab0', pip: '#ffffff' },
+  { id: 'black', label: 'Black', die: '#1c1c1c', pip: '#f0f0f0' },
+]
+
+const colorById = (id) =>
+  DICE_COLORS.find((c) => c.id === id) ?? DICE_COLORS[0]
+
+const randomFace = () => Math.floor(Math.random() * 6) + 1
+
+/** A single D6 face rendered with pips, in the given colour. */
+function Die({ value, colorId, rolling }) {
+  const color = colorById(colorId)
   const litCells = PIP_LAYOUT[value] ?? []
   return (
-    <div className={`die ${rolling ? 'rolling' : ''}`} aria-label={`Die showing ${value}`}>
+    <div
+      className={`die ${rolling ? 'rolling' : ''}`}
+      style={{ '--die-bg': color.die, '--pip-color': color.pip }}
+      aria-label={`${color.label} die showing ${value}`}
+    >
       {Array.from({ length: 9 }, (_, cell) => (
         <span key={cell} className="die-cell">
           {litCells.includes(cell) && <span className="pip" />}
@@ -31,30 +53,53 @@ function Die({ value, rolling }) {
 }
 
 /**
- * The dice tray: a wooden-rimmed green felt surface with a single D6
- * you can roll. The last result is persisted to localStorage.
+ * The dice tray: a wooden-rimmed green felt surface holding any number of
+ * D6s. Add dice in the colour of your choice and roll them all at once.
+ * The set of dice is persisted to localStorage.
  */
 export default function DiceTray() {
-  const [value, setValue] = useLocalStorage('40k.lastRoll', 1)
+  const [dice, setDice] = useLocalStorage('40k.dice', [
+    { id: 'die-1', value: 1, colorId: 'white' },
+  ])
+  const [selectedColor, setSelectedColor] = useLocalStorage(
+    '40k.diceColor',
+    'white',
+  )
   const [rolling, setRolling] = useState(false)
   const intervalRef = useRef(null)
 
   // Clean up the scramble interval if we unmount mid-roll.
   useEffect(() => () => clearInterval(intervalRef.current), [])
 
-  const roll = () => {
+  const addDie = () => {
+    setDice((current) => [
+      ...current,
+      {
+        id: `die-${Date.now()}-${current.length}`,
+        value: randomFace(),
+        colorId: selectedColor,
+      },
+    ])
+  }
+
+  const clearDice = () => {
     if (rolling) return
+    setDice([])
+  }
+
+  const rollAll = () => {
+    if (rolling || dice.length === 0) return
     setRolling(true)
 
-    // Rapidly flick through random faces to fake a tumble...
+    // Rapidly flick every die through random faces to fake a tumble...
     intervalRef.current = setInterval(() => {
-      setValue(Math.floor(Math.random() * 6) + 1)
+      setDice((current) => current.map((d) => ({ ...d, value: randomFace() })))
     }, 70)
 
-    // ...then settle on the final result after a short spin.
+    // ...then settle on the final results after a short spin.
     setTimeout(() => {
       clearInterval(intervalRef.current)
-      setValue(Math.floor(Math.random() * 6) + 1)
+      setDice((current) => current.map((d) => ({ ...d, value: randomFace() })))
       setRolling(false)
     }, 650)
   }
@@ -62,12 +107,62 @@ export default function DiceTray() {
   return (
     <section className="dice-tray-frame">
       <div className="dice-tray-felt">
-        <Die value={value} rolling={rolling} />
+        {dice.length === 0 ? (
+          <p className="tray-empty">Add a die to begin</p>
+        ) : (
+          <div className="dice-grid">
+            {dice.map((d) => (
+              <Die
+                key={d.id}
+                value={d.value}
+                colorId={d.colorId}
+                rolling={rolling}
+              />
+            ))}
+          </div>
+        )}
       </div>
 
-      <button className="btn roll-btn" onClick={roll} disabled={rolling}>
-        {rolling ? 'Rolling…' : 'Roll D6'}
-      </button>
+      <div className="tray-controls">
+        <div
+          className="color-swatches"
+          role="radiogroup"
+          aria-label="New die colour"
+        >
+          {DICE_COLORS.map((c) => (
+            <button
+              key={c.id}
+              type="button"
+              className={`swatch ${selectedColor === c.id ? 'selected' : ''}`}
+              style={{ background: c.die }}
+              onClick={() => setSelectedColor(c.id)}
+              aria-label={c.label}
+              aria-pressed={selectedColor === c.id}
+              title={c.label}
+            />
+          ))}
+        </div>
+
+        <div className="tray-buttons">
+          <button className="tray-btn add-btn" onClick={addDie} disabled={rolling}>
+            + Add D6
+          </button>
+          <button
+            className="tray-btn roll-btn"
+            onClick={rollAll}
+            disabled={rolling || dice.length === 0}
+          >
+            {rolling ? 'Rolling…' : 'Roll'}
+          </button>
+          <button
+            className="tray-btn clear-btn"
+            onClick={clearDice}
+            disabled={rolling || dice.length === 0}
+          >
+            Clear
+          </button>
+        </div>
+      </div>
     </section>
   )
 }
