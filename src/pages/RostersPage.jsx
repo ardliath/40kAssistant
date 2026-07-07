@@ -1,6 +1,7 @@
-import { useState } from 'react'
+import { useState, useRef } from 'react'
 import { useLocalStorage } from '../hooks/useLocalStorage'
 import { DICE_COLORS } from '../diceColors'
+import { downloadRoster, parseRosterFile } from '../rosterFiles'
 import { uid } from '../uid'
 import './RostersPage.css'
 
@@ -21,6 +22,23 @@ export default function RostersPage() {
   const [openRosterId, setOpenRosterId] = useState(null)
   const [openUnitId, setOpenUnitId] = useState(null)
   const [newRosterName, setNewRosterName] = useState('')
+  const [importError, setImportError] = useState(null)
+  const fileInputRef = useRef(null)
+
+  // ---- import / export ----
+  const importFromFile = async (e) => {
+    const file = e.target.files?.[0]
+    e.target.value = '' // allow re-selecting the same file later
+    if (!file) return
+    try {
+      const roster = parseRosterFile(await file.text())
+      setRosters((rs) => [...rs, roster])
+      setOpenRosterId(roster.id)
+      setImportError(null)
+    } catch (err) {
+      setImportError(err.message)
+    }
+  }
 
   // ---- immutable update helpers ----
   const updateRoster = (rosterId, fn) =>
@@ -146,7 +164,26 @@ export default function RostersPage() {
           <button className="roster-btn primary" onClick={addRoster}>
             + Add Roster
           </button>
+          <button
+            className="roster-btn"
+            onClick={() => fileInputRef.current?.click()}
+          >
+            Import…
+          </button>
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept=".json,application/json"
+            onChange={importFromFile}
+            hidden
+          />
         </div>
+
+        {importError && (
+          <p className="roster-error" role="alert">
+            Import failed: {importError}
+          </p>
+        )}
 
         {rosters.length === 0 && (
           <p className="roster-empty">
@@ -178,6 +215,13 @@ export default function RostersPage() {
               <span className="roster-meta">
                 {roster.units.length} unit{roster.units.length === 1 ? '' : 's'}
               </span>
+              <button
+                className="roster-btn"
+                onClick={() => downloadRoster(roster)}
+                title="Download this roster as a JSON file"
+              >
+                Export
+              </button>
               <button
                 className="roster-btn danger"
                 onClick={() => deleteRoster(roster.id)}
