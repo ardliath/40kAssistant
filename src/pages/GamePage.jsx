@@ -1,4 +1,5 @@
 import { useLocalStorage } from '../hooks/useLocalStorage'
+import { startNewGame } from '../newGame'
 import DiceTray from '../components/DiceTray'
 import UnitThrowPanel from '../components/UnitThrowPanel'
 import TurnTracker from '../components/TurnTracker'
@@ -26,6 +27,21 @@ export default function GamePage() {
         <TurnTracker />
         <VictoryPointTracker />
         <CommandPointTracker />
+
+        <button
+          className="new-game-btn"
+          onClick={() => {
+            if (
+              window.confirm(
+                'Start a new game? Turn, victory points and command points reset, and all models are revived.',
+              )
+            ) {
+              startNewGame()
+            }
+          }}
+        >
+          ⚔ New Game
+        </button>
       </aside>
     </main>
   )
