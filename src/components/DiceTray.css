@@ -1,0 +1,49 @@
+/* Wooden outer frame of the tray */
+.dice-tray-frame {
+  border-radius: 16px;
+  padding: 18px;
+  min-height: 420px;
+  display: flex;
+  /* Layered gradients fake a stained-wood rim */
+  background:
+    repeating-linear-gradient(
+      90deg,
+      rgba(0, 0, 0, 0.12) 0px,
+      rgba(0, 0, 0, 0.12) 2px,
+      rgba(255, 255, 255, 0.03) 2px,
+      rgba(255, 255, 255, 0.03) 5px
+    ),
+    linear-gradient(145deg, #5a3a21 0%, #3f2716 45%, #593920 100%);
+  box-shadow:
+    0 10px 30px rgba(0, 0, 0, 0.5),
+    inset 0 1px 1px rgba(255, 255, 255, 0.15);
+}
+
+/* Green felt playing surface, recessed into the frame */
+.dice-tray-felt {
+  flex: 1;
+  border-radius: 10px;
+  /* Radial highlight + subtle felt speckle from layered gradients */
+  background:
+    radial-gradient(
+      ellipse at 50% 35%,
+      #2f7d4f 0%,
+      #256540 55%,
+      #1c4d31 100%
+    );
+  background-color: #256540;
+  box-shadow:
+    inset 0 0 60px rgba(0, 0, 0, 0.55),
+    inset 0 2px 4px rgba(0, 0, 0, 0.6);
+  position: relative;
+}
+
+/* Faint stitched border just inside the felt for a card-table feel */
+.dice-tray-felt::after {
+  content: '';
+  position: absolute;
+  inset: 12px;
+  border: 2px dashed rgba(255, 255, 255, 0.08);
+  border-radius: 8px;
+  pointer-events: none;
+}

@@ -1,3 +1,4 @@
+import DiceTray from './components/DiceTray'
 import TurnTracker from './components/TurnTracker'
 import VictoryPointTracker from './components/VictoryPointTracker'
 import CommandPointTracker from './components/CommandPointTracker'
@@ -11,10 +12,14 @@ export default function App() {
         <p className="subtitle">Game Tracker</p>
       </header>
 
-      <main className="trackers">
-        <TurnTracker />
-        <VictoryPointTracker />
-        <CommandPointTracker />
+      <main className="game-layout">
+        <DiceTray />
+
+        <aside className="trackers">
+          <TurnTracker />
+          <VictoryPointTracker />
+          <CommandPointTracker />
+        </aside>
       </main>
     </div>
   )
