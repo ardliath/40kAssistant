@@ -1,0 +1,116 @@
+.throw-panel {
+  background: linear-gradient(160deg, #1e1a17 0%, #16130f 100%);
+  border: 1px solid #3a332b;
+  border-radius: 12px;
+  padding: 1.25rem;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+}
+
+.throw-panel h2 {
+  margin: 0 0 1rem;
+  font-size: 1.1rem;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: #c9b892;
+}
+
+.throw-empty {
+  margin: 0;
+  color: #9a8f80;
+  font-size: 0.9rem;
+}
+
+.throw-empty a {
+  color: #d4af37;
+}
+
+/* ---- Roster / unit / throw selectors ---- */
+.throw-selects {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.throw-selects select {
+  flex: 1;
+  min-width: 130px;
+  padding: 0.5rem 0.6rem;
+  border-radius: 8px;
+  border: 1px solid #4a4136;
+  background: #16130f;
+  color: #e8e0d5;
+  font-family: inherit;
+  font-size: 0.9rem;
+}
+
+.throw-selects select:disabled {
+  opacity: 0.45;
+}
+
+/* ---- Model list ---- */
+.throw-models {
+  list-style: none;
+  margin: 1rem 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.throw-models li {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 0.45rem 0.6rem;
+  border-radius: 8px;
+  background: rgba(0, 0, 0, 0.22);
+}
+
+.throw-models li.model-dead {
+  opacity: 0.55;
+}
+
+.throw-models li.model-dead .model-name {
+  text-decoration: line-through;
+}
+
+.dead-label {
+  width: 13px;
+  text-align: center;
+}
+
+.model-name {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.model-dice {
+  font-size: 0.8rem;
+  color: #9a8f80;
+  white-space: nowrap;
+}
+
+.dead-btn {
+  padding: 0.25rem 0.7rem;
+  border-radius: 6px;
+  border: 1px solid #5a3230;
+  background: transparent;
+  color: #d9827f;
+  font-family: inherit;
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s ease;
+}
+
+.dead-btn:hover {
+  background: rgba(217, 83, 79, 0.12);
+}
+
+/* ---- Load button ---- */
+.throw-load-btn {
+  width: 100%;
+}

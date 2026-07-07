@@ -48,18 +48,26 @@ function Die({ value, colorId, rolling, selected, disabled, onClick }) {
  * The dice tray: a wooden-rimmed green felt surface holding any number of
  * D6s. Add dice in the colour of your choice, click dice to select them,
  * and roll/clear either the whole tray or just your selection.
- * The set of dice is persisted to localStorage.
+ * The dice themselves are owned by the parent (GamePage), which persists
+ * them to localStorage — that lets other components load dice into the tray.
  */
-export default function DiceTray() {
-  const [dice, setDice] = useLocalStorage('40k.dice', [
-    { id: 'die-1', value: 1, colorId: 'white' },
-  ])
+export default function DiceTray({ dice, setDice }) {
   const [selectedColor, setSelectedColor] = useLocalStorage(
     '40k.diceColor',
     'white',
   )
   // Ids of currently selected dice (transient UI state, not persisted).
   const [selectedIds, setSelectedIds] = useState(() => new Set())
+
+  // If dice are replaced from outside (e.g. a unit throw loaded into the
+  // tray), drop any selection ids that no longer exist.
+  useEffect(() => {
+    setSelectedIds((prev) => {
+      const live = new Set(dice.map((d) => d.id))
+      const next = new Set([...prev].filter((id) => live.has(id)))
+      return next.size === prev.size ? prev : next
+    })
+  }, [dice])
   // Ids of dice mid-roll; while non-empty a roll animation is in progress.
   const [rollingIds, setRollingIds] = useState(() => new Set())
   const rolling = rollingIds.size > 0

@@ -1,0 +1,204 @@
+.rosters-page {
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+.roster-panel h2 {
+  margin: 0 0 1rem;
+  font-size: 1.1rem;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: #c9b892;
+}
+
+/* ---- Shared form elements ---- */
+.rosters-page input[type='text'],
+.rosters-page input[type='number'],
+.rosters-page select {
+  padding: 0.45rem 0.6rem;
+  border-radius: 8px;
+  border: 1px solid #4a4136;
+  background: #16130f;
+  color: #e8e0d5;
+  font-family: inherit;
+  font-size: 0.9rem;
+}
+
+.rosters-page input[type='number'] {
+  width: 3.6rem;
+}
+
+.roster-btn {
+  padding: 0.45rem 0.9rem;
+  border-radius: 8px;
+  border: 1px solid #4a4136;
+  background: #2b2620;
+  color: #e8e0d5;
+  font-family: inherit;
+  font-size: 0.85rem;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  cursor: pointer;
+  transition: background 0.15s ease;
+  white-space: nowrap;
+}
+
+.roster-btn:hover {
+  background: #3a332b;
+}
+
+.roster-btn.primary {
+  border-color: #b8962f;
+  background: linear-gradient(160deg, #d4af37 0%, #b8962f 100%);
+  color: #1a1512;
+}
+
+.roster-btn.primary:hover {
+  filter: brightness(1.1);
+}
+
+.roster-btn.danger {
+  color: #d9827f;
+  background: transparent;
+  border-color: #5a3230;
+}
+
+.roster-btn.danger:hover {
+  background: rgba(217, 83, 79, 0.12);
+}
+
+.roster-btn.small {
+  padding: 0.25rem 0.55rem;
+  font-size: 0.8rem;
+}
+
+/* ---- Add-roster row ---- */
+.roster-add-row {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 1.25rem;
+}
+
+.roster-add-row input {
+  flex: 1;
+}
+
+.roster-empty {
+  color: #9a8f80;
+  font-style: italic;
+  font-size: 0.9rem;
+}
+
+/* ---- Roster / unit cards ---- */
+.roster-card,
+.unit-card {
+  background: linear-gradient(160deg, #1e1a17 0%, #16130f 100%);
+  border: 1px solid #3a332b;
+  border-radius: 12px;
+  padding: 0.9rem;
+  margin-bottom: 0.9rem;
+}
+
+.unit-card {
+  background: rgba(0, 0, 0, 0.2);
+}
+
+.roster-card-header,
+.unit-card-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.roster-toggle {
+  border: none;
+  background: transparent;
+  color: #c9b892;
+  font-size: 1rem;
+  cursor: pointer;
+  padding: 2px 6px;
+}
+
+.roster-name-input {
+  flex: 1;
+  min-width: 0;
+  font-weight: 600;
+}
+
+.roster-meta {
+  font-size: 0.8rem;
+  color: #9a8f80;
+  white-space: nowrap;
+}
+
+.roster-units {
+  margin-top: 0.9rem;
+  padding-left: 1.4rem;
+}
+
+/* ---- Unit editor ---- */
+.unit-editor {
+  margin-top: 0.9rem;
+}
+
+.unit-editor-actions {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 0.9rem;
+}
+
+.unit-table-wrap {
+  overflow-x: auto;
+}
+
+.unit-table {
+  border-collapse: collapse;
+  width: 100%;
+}
+
+.unit-table th,
+.unit-table td {
+  padding: 0.4rem 0.5rem;
+  text-align: left;
+  border-bottom: 1px solid #2b2620;
+  vertical-align: middle;
+}
+
+.unit-table th {
+  font-size: 0.75rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: #9a8f80;
+}
+
+.cell-center {
+  text-align: center;
+}
+
+.throw-header {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+}
+
+.throw-header input {
+  width: 7.5rem;
+}
+
+.dice-spec {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+}
+
+.model-actions {
+  display: flex;
+  gap: 6px;
+}
+
+/* Dead models grey out in the editor */
+.model-dead .roster-name-input,
+.model-dead input[type='text'] {
+  opacity: 0.45;
+  text-decoration: line-through;
+}
