@@ -204,7 +204,7 @@ export default function DiceTray({ dice, setDice }) {
         {dice.length === 0 ? (
           <p className="tray-empty">Add a die to begin</p>
         ) : (
-          <div className="dice-grid">
+          <div className={`dice-grid ${dice.length > 8 ? 'compact' : ''}`}>
             {dice.map((d) => (
               <Die
                 key={d.id}
